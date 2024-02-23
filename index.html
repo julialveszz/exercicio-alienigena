@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercício do Alien - Júlia Alves de Jesus</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <style> body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; } </style>
+</head>
+
+<body>
+    <script>
+        // o que acontece aqui?
+        const larguraJogo = 700;
+        const alturaJogo = 850;
+
+        // o que essa parte faz?
+        const config = {
+            type: Phaser.AUTO,
+            width: larguraJogo,
+            height: alturaJogo,
+
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 500 },
+                    debug: true
+                }
+            },
+
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+
+        // o que acontece aqui?
+        const game = new Phaser.Game(config);
+
+        // Declara as variáveis que serão utilizadas no jogo
+        var alien;
+        var teclado;
+        var fogo;
+        var plataforma;
+        var moeda;
+        var coracao;
+        var pontuacao = 0;
+        var pontuacao2 = 0;
+        var placar;
+        var placar2;
+        var nuvem;
+        
+
+        function preload() {
+            this.load.image('background', 'assets/bg.png');
+            this.load.image('player', 'assets/alienigena.png');
+            this.load.image('turbo_nave', 'assets/turbo.png');
+            this.load.image('plataforma', 'assets/tijolos.png');
+            this.load.image('moeda', 'assets/moeda.png');
+            this.load.image('coracao', 'assets/coracao.png');
+            this.load.image('nuvem', 'assets/nuvem.png');
+        }
+
+         function create() {
+            
+            this.add.image(larguraJogo/2, alturaJogo/2, 'background');
+            
+            fogo = this.add.sprite(0, 0, 'turbo_nave');
+            fogo.setVisible(false);
+
+            alien = this.physics.add.sprite(larguraJogo/2, 0, 'player');
+            alien.setCollideWorldBounds(true);
+            
+            teclado = this.input.keyboard.createCursorKeys();
+            
+            // adicionando placar 
+            placar = this.add.text(50, 50, 'Moedas:' + pontuacao, {fontSize:'45px', fill:'#495613'});
+
+            // placar coração
+            placar2 = this.add.text(400, 50, 'Corações:' + pontuacao2, {fontSize:'45px', fill:'#495613'});
+           
+
+        plataforma = this.physics.add.staticImage(larguraJogo/2, alturaJogo/2, 'plataforma');
+        this.physics.add.collider(alien, plataforma);
+
+        // Segundo obstáculo
+
+        nuvem = this.physics.add.staticImage(180, 600, 'nuvem');;
+        nuvem.body.setSize(100, 60, true);
+
+        // Adiciona colisão da nuvem com o alien
+        this.physics.add.collider(alien, nuvem);
+        
+        moeda = this.physics.add.sprite(larguraJogo/2, 0, 'moeda');
+        moeda.setCollideWorldBounds(true);
+        moeda.setBounce(0.7);
+        this.physics.add.collider(moeda, plataforma);
+
+        this.physics.add.overlap(alien, moeda, function(){
+
+moeda.setVisible(false);
+var posicaoMoeda_Y = Phaser.Math.RND.between(50, 650);
+moeda.setPosition(posicaoMoeda_Y, 100);
+pontuacao +=1;
+placar.setText('Moedas:' + pontuacao); 
+moeda.setVisible(true); });
+
+
+coracao = this.physics.add.sprite(larguraJogo/2, 0, 'coracao');
+        coracao.setCollideWorldBounds(true);
+        coracao.setBounce(0.7);
+        this.physics.add.collider(coracao, plataforma);
+
+
+// Adiciona a física relacionada ao coração
+        this.physics.add.overlap(alien, coracao, function(){
+
+coracao.setVisible(false);
+var posicaoCoracao_Y = Phaser.Math.RND.between(50, 650);
+coracao.setPosition(posicaoCoracao_Y, 100);
+pontuacao2 +=1;
+placar2.setText('Corações:' + pontuacao2); 
+coracao.setVisible(true); });
+
+// Adiciona colisão da nuvem com outros objetos
+    this.physics.add.collider(nuvem, moeda); 
+        this.physics.add.collider(nuvem, coracao);
+        }
+
+        function update() {
+
+if (teclado.left.isDown) {
+    alien.setVelocityX(-350); } 
+
+else if (teclado.right.isDown) {
+    alien.setVelocityX(350); } 
+
+else { 
+    alien.setVelocityX(0); }
+
+if (teclado.up.isDown) {
+    alien.setVelocityY(-320);
+    ativarTurbo();
+  
+} 
+
+else { semTurbo(); }
+
+fogo.setPosition(alien.x, alien.y + alien.height/2);
+
+function ativarTurbo() {
+fogo.setVisible(true);
+}
+
+function semTurbo() {
+fogo.setVisible(false);
+}
+
+//LISTA ARRAY 
+var nomes = ["Parabens 5 coracoes!", "Parabens, 10 moedas!"];
+
+if (pontuacao2 == 5){
+console.log(nomes[0]);
+}
+if (pontuacao == 10){
+    console.log(nomes[1]);
+}
+}
+ 
+    </script>
+</body>
+</html>
